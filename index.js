@@ -29,6 +29,8 @@ async function run() {
     await client.connect();
 
     const courseCollection = client.db("skillExpress").collection("course");
+    const categoryCollection = client.db("skillExpress").collection("category");
+    const cartCollection = client.db("skillExpress").collection("cart");
 
     // course api
     app.get("/course", async (req, res) => {
@@ -47,6 +49,33 @@ async function run() {
         const result = await courseCollection.deleteOne(query);
         res.send(result);
     })
+
+    // category api
+    app.get("/category", async (req, res) => {
+        const result = await categoryCollection.find().toArray();
+        res.send(result);
+    });
+
+    // cart api
+    app.post("/cart", async (req, res) => {
+        const course = req.body;
+        const result = await cartCollection.insertOne(course);
+        res.send(result);
+    });
+
+    app.get("/cart", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await cartCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.delete("/cart/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
 
 
 
